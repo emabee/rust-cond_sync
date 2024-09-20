@@ -1,0 +1,20 @@
+[package]
+name = "cond_sync"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70" # to be clarified
+
+description = "Hides the biolerplate code you need with std::sync::Condvar"
+readme = true
+repository = "https://github.com/emabee/cond_sync"
+license = "MIT OR Apache-2.0"
+keywords = ["concurrency", "synchronization"]
+categories = ["concurrency"]
+
+[dependencies]
+
+[dev-dependencies]
+version-sync = "0.9"
+
+[lints.rust]
+unsafe_code = "forbid"
