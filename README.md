@@ -1,6 +1,6 @@
 # cond_sync
 
-**A thin wrapper around std::sync::CondVar (and std::sync::Mutex) that enhances readability when synchronizing threads.**
+**A thin wrapper around CondVar and Mutex (from std::sync) that enhances readability when synchronizing threads.**
 
 [![Latest version](https://img.shields.io/crates/v/cond_sync.svg)](https://crates.io/crates/cond_sync)
 [![Documentation](https://docs.rs/cond_sync/badge.svg)](https://docs.rs/cond_sync)
