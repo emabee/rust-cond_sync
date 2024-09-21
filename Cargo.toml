@@ -1,10 +1,10 @@
 [package]
 name = "cond_sync"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-rust-version = "1.70" # to be clarified
+rust-version = "1.70"
 
-description = "Hides the biolerplate code you need with std::sync::Condvar"
+description = "Hides the boilerplate code needed with std::sync::Condvar"
 readme = true
 repository = "https://github.com/emabee/cond_sync"
 license = "MIT OR Apache-2.0"

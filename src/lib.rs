@@ -8,20 +8,17 @@
 //! Facilitates the synchronization of threads.
 //!
 //! The struct [`CondSync`] is a thin wrapper around
-//! `std::sync::Arc<(std::sync::Mutex<T>, std::sync::Condvar)>` and hides ugly boiler plate code
-//! you need to write when using `std::sync::Condvar` directly.
-//!
-//! The struct [`CondSync`] is a thin wrapper around
-//! [`Arc`]`<(`[`Mutex`]`<T>, `[`Condvar`]`)>` and hides ugly boiler plate code
-//! you need to write when using [`Condvar`] directly.
+//! [`Arc`]`<(`[`Mutex`]`<T>, `[`Condvar`]`)>` and hides boiler plate code
+//! that is needed when using `std::sync::Condvar` directly.
 use std::{
     sync::{Arc, Condvar, Mutex, PoisonError},
     time::{Duration, Instant},
 };
 
-/// A thin wrapper around `std::sync::Arc<(std::sync::Mutex<T>, std::sync::Condvar)>`.
+/// A thin wrapper around [`Arc`]`<(`[`Mutex`]`<T>, `[`Condvar`]`)>`.
 ///
-/// It enhances readability when synchronizing threads.
+/// It enhances readability when synchronizing threads
+/// (compare with the examples given for [`Condvar`]).
 ///
 /// ## Example: Inform main thread when all child threads have initialized:
 ///
@@ -30,19 +27,22 @@ use std::{
 /// use std::{thread, time::Duration};
 /// const NO_OF_THREADS: usize = 5;
 ///
-/// let cond_sync = CondSync::new(0_usize); // <- use a plain usize as condition state
+/// // we use here a plain usize as condition state:
+/// let cond_sync = CondSync::new(0_usize);
 ///
 /// for i in 0..NO_OF_THREADS {
 ///     let cond_sync_t = cond_sync.clone();
 ///     thread::spawn(move || {
 ///         println!("Thread {i}: initializing ...");
-///         cond_sync_t.modify_and_notify(|v| *v += 1, Other::One).unwrap(); // <- modify the state
+///         // modify the state:
+///         cond_sync_t.modify_and_notify(|v| *v += 1, Other::One).unwrap();
 ///
 ///         thread::sleep(Duration::from_millis(1)); // just to produce a yield
 ///         println!("Thread {i}: work on phase 1");
 ///     });
 /// }
-/// cond_sync.wait_until(|v| *v == NO_OF_THREADS).unwrap(); // <- evaluate the condition state
+/// // evaluate the condition state:
+/// cond_sync.wait_until(|v| *v == NO_OF_THREADS).unwrap();
 ///
 /// println!("Main: All threads initialized");
 /// thread::sleep(Duration::from_millis(100)); // just to let the threads finish (better use join)
@@ -85,12 +85,10 @@ impl<T> CondSync<T> {
     ///
     /// ## Errors
     ///
-    /// This function will return an error if the internally used mutex being waited on is poisoned
-    /// when this thread re-acquires the lock.
+    /// This function will return an error if the internally used mutex being waited on is
+    /// poisoned when this thread tries to re-acquire the lock.
     /// For more information, see information about poisoning on the Mutex type.
-    ///
-    /// ## TODO Example
-    pub fn wait_until<F>(&self, condition: F) -> Result<Reason, CondSyncError>
+    pub fn wait_until<F>(&self, condition: F) -> Result<Reason, PoisonedError>
     where
         F: Fn(&T) -> bool,
     {
@@ -111,16 +109,14 @@ impl<T> CondSync<T> {
     ///
     /// ## Errors
     ///
-    /// This function will return an error if the internally used mutex being waited on is poisoned
-    /// when this thread re-acquires the lock.
+    /// This function will return an error if the internally used mutex being waited on is
+    /// poisoned when this thread re-acquires the lock.
     /// For more information, see information about poisoning on the Mutex type.
-    ///
-    /// ## TODO Example
     pub fn wait_until_or_timeout<F>(
         &self,
         condition: F,
         duration: Duration,
-    ) -> Result<Reason, CondSyncError>
+    ) -> Result<Reason, PoisonedError>
     where
         F: Fn(&T) -> bool,
     {
@@ -135,7 +131,7 @@ impl<T> CondSync<T> {
                     }
                     mtx_guard = mtxg;
                 }
-                Err(_) => return Err(CondSyncError::Poison),
+                Err(_) => return Err(PoisonedError),
             }
         }
         Ok(Reason::Condition)
@@ -150,12 +146,10 @@ impl<T> CondSync<T> {
     ///
     /// ## Errors
     ///
-    /// This function will return an error if the internally used mutex being waited on is poisoned
-    /// when this thread re-acquires the lock.
+    /// This function will return an error if the internally used mutex being waited on is
+    /// poisoned when this thread re-acquires the lock.
     /// For more information, see information about poisoning on the Mutex type.
-    ///
-    /// ## TODO Example
-    pub fn wait_timeout(&self, duration: Duration) -> Result<Reason, CondSyncError> {
+    pub fn wait_timeout(&self, duration: Duration) -> Result<Reason, PoisonedError> {
         let mtx_guard = self.0.mtx.lock()?;
         let end = Instant::now() + duration;
 
@@ -177,10 +171,10 @@ impl<T> CondSync<T> {
     ///
     /// ## Errors
     ///
-    /// This function will return an error if the internally used mutex being waited on is poisoned
-    /// when this thread re-acquires the lock.
+    /// This function will return an error if the internally used mutex being waited on is
+    /// poisoned when this thread re-acquires the lock.
     /// For more information, see information about poisoning on the Mutex type.
-    pub fn modify_and_notify<F>(&self, modify: F, other: Other) -> Result<(), CondSyncError>
+    pub fn modify_and_notify<F>(&self, modify: F, other: Other) -> Result<(), PoisonedError>
     where
         F: Fn(&mut T),
     {
@@ -224,43 +218,41 @@ pub enum Other {
     All,
 }
 
-/// Helper enum to decide if one or all of the other threads should be notified.
+/// Describes why the method returned (if it returned successfully).
 #[derive(Copy, Clone)]
 pub enum Reason {
-    /// Timeout occured.
+    /// The timeout was reached.
     Timeout,
-    /// Condition fulfilled.
+    /// A notification was received and the condition is fulfilled.
     Condition,
-    /// Notification received.
+    /// A notification was received.
     Notification,
 }
 impl Reason {
-    /// TODO
+    /// Convenience method to check the concrete reason.
     #[must_use]
     pub fn is_timeout(&self) -> bool {
         matches!(&self, Self::Timeout)
     }
-    /// TODO
+    /// Convenience method to check the concrete reason.
     #[must_use]
     pub fn is_condition(&self) -> bool {
         matches!(&self, Self::Condition)
     }
-    /// TODO
+    /// Convenience method to check the concrete reason.
     #[must_use]
     pub fn is_notification(&self) -> bool {
         matches!(&self, Self::Notification)
     }
 }
 
-/// FIXME
-#[non_exhaustive]
+/// The inner mutex got poisoned.
+///
+/// This most likely happens if one of the provided closures panics.
 #[derive(Debug)]
-pub enum CondSyncError {
-    /// `std::sync::PoisonError` occured.
-    Poison,
-}
-impl<T> From<PoisonError<T>> for CondSyncError {
-    fn from(_e: PoisonError<T>) -> CondSyncError {
-        CondSyncError::Poison
+pub struct PoisonedError;
+impl<T> From<PoisonError<T>> for PoisonedError {
+    fn from(_e: PoisonError<T>) -> PoisonedError {
+        PoisonedError
     }
 }

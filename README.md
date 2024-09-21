@@ -10,12 +10,16 @@
 
 ## Usage
 
-Add `cond_sync` to the dependencies section in your project's `Cargo.toml`:
+Add `cond_sync` to the dependencies in your project's `Cargo.toml`:
 
 ```toml
 [dependencies]
-cond_sync = "0.1"
+cond_sync = "0.2"
 ```
+
+## Dependencies
+
+No dependencies.
 
 ## Versions
 
