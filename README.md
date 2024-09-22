@@ -1,6 +1,6 @@
 # cond_sync
 
-**A thin wrapper around CondVar and Mutex (from std::sync) that enhances readability when synchronizing threads.**
+**A thin wrapper around std::sync::CondVar and Mutex that enhances readability when synchronizing threads.**
 
 [![Latest version](https://img.shields.io/crates/v/cond_sync.svg)](https://crates.io/crates/cond_sync)
 [![Documentation](https://docs.rs/cond_sync/badge.svg)](https://docs.rs/cond_sync)
@@ -15,6 +15,27 @@ Add `cond_sync` to the dependencies in your project's `Cargo.toml`:
 ```toml
 [dependencies]
 cond_sync = "0.2"
+```
+
+## Example
+
+```rust
+use cond_sync::{CondSync, Other};
+
+let cond_sync = CondSync::new(0_usize);
+
+for i in 0..5 {
+    let cond_sync_t = cond_sync.clone();
+    std::thread::spawn(move || {
+        // ...initialize...
+        cond_sync_t.modify_and_notify(|v| *v += 1, Other::One).unwrap();
+        // ...do real work...
+    });
+}
+// wait until all threads are initialized
+cond_sync.wait_until(|v| *v == 5).unwrap();
+
+// ...
 ```
 
 ## Dependencies

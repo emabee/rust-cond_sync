@@ -25,12 +25,11 @@ use std::{
 /// ```rust
 /// use cond_sync::{CondSync, Other};
 /// use std::{thread, time::Duration};
-/// const NO_OF_THREADS: usize = 5;
 ///
 /// // we use here a plain usize as condition state:
 /// let cond_sync = CondSync::new(0_usize);
 ///
-/// for i in 0..NO_OF_THREADS {
+/// for i in 0..5 {
 ///     let cond_sync_t = cond_sync.clone();
 ///     thread::spawn(move || {
 ///         println!("Thread {i}: initializing ...");
@@ -41,8 +40,8 @@ use std::{
 ///         println!("Thread {i}: work on phase 1");
 ///     });
 /// }
-/// // evaluate the condition state:
-/// cond_sync.wait_until(|v| *v == NO_OF_THREADS).unwrap();
+/// // [main thread] wait here until the condition is fulfilled:
+/// cond_sync.wait_until(|v| *v == 5).unwrap();
 ///
 /// println!("Main: All threads initialized");
 /// thread::sleep(Duration::from_millis(100)); // just to let the threads finish (better use join)
