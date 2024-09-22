@@ -13,7 +13,7 @@ jobs:
     name: Check formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install latest nightly with rustfmt
         uses: actions-rs/toolchain@v1
@@ -24,10 +24,7 @@ jobs:
           components: rustfmt
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+        uses: actions-rust-lang/rustfmt@v1
 
   clippy_check:
     runs-on: ubuntu-latest
@@ -44,7 +41,7 @@ jobs:
         rust: [ stable, 1.70.0 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
