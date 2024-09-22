@@ -5,7 +5,7 @@
 [![Latest version](https://img.shields.io/crates/v/cond_sync.svg)](https://crates.io/crates/cond_sync)
 [![Documentation](https://docs.rs/cond_sync/badge.svg)](https://docs.rs/cond_sync)
 [![License](https://img.shields.io/crates/l/cond_sync.svg)](https://github.com/emabee/cond_sync)
-[![Build](https://img.shields.io/github/actions/workflow/status/emabee/rust-cond_sync/ci_test.yml?branch=master)](https://github.com/emabee/rust-cond_sync/actions?query=workflow%3ACI)
+[![Build](https://img.shields.io/github/actions/workflow/status/emabee/rust-cond_sync/ci_test.yml?branch=main)](https://github.com/emabee/rust-cond_sync/actions?query=workflow%3ACI)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 ## Usage
