@@ -86,6 +86,6 @@ fn main() {
     - \"cargo publish\""
     );
 
-    // cleanup
-    run_script("cleanup");
+    // // cleanup
+    // run_script("cleanup");
 }
