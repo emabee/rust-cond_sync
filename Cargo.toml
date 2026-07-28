@@ -10,6 +10,7 @@ repository = "https://github.com/emabee/rust-cond_sync"
 license = "MIT OR Apache-2.0"
 keywords = ["concurrency", "synchronization"]
 categories = ["concurrency"]
+exclude = ["/scripts/"]
 
 [dependencies]
 
