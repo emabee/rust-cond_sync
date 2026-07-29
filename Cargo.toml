@@ -1,6 +1,6 @@
 [package]
 name = "cond_sync"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 rust-version = "1.85"
 
@@ -10,12 +10,9 @@ repository = "https://github.com/emabee/rust-cond_sync"
 license = "MIT OR Apache-2.0"
 keywords = ["concurrency", "synchronization"]
 categories = ["concurrency"]
-exclude = ["/scripts/"]
+exclude = ["/scripts"]
 
 [dependencies]
 
 [dev-dependencies]
 version-sync = "0.9"
-
-[lints.rust]
-unsafe_code = "forbid"
